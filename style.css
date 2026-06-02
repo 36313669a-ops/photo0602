@@ -1,0 +1,59 @@
+body {
+  font-family: sans-serif;
+  margin: 0;
+  background: #111;
+  color: white;
+}
+
+header {
+  text-align: center;
+  padding: 20px;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  padding: 10px;
+}
+
+.card {
+  background: #222;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.img-wrap {
+  position: relative;
+}
+
+.photo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.qr {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  width: 60px;
+}
+
+.info {
+  padding: 10px;
+}
+
+.single {
+  text-align: center;
+}
+
+.bigphoto {
+  max-width: 90%;
+  height: auto;
+}
+
+button {
+  margin: 10px;
+  padding: 10px;
+}
