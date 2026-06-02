@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>攝影投票（穩定版）</title>
+
+<style>
+body{
+    font-family:Microsoft JhengHei;
+    margin:0;
+    background:#f5f5f5;
+}
+
+.container{
+    max-width:900px;
+    margin:20px auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+}
+
+img{
+    width:100%;
+    border-radius:10px;
+    background:#ddd;
+}
+
+button{
+    padding:10px 15px;
+    margin:5px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.vote{background:green;color:white;}
+.undo{background:red;color:white;}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>📌 DEBUG資訊</h2>
+<div id="debug">初始化中...</div>
+
+<hr>
+
+<img id="photo">
+
+<h2 id="title"></h2>
+
+<p>攝影者：<span id="author"></span></p>
+
+<h3>票數：<span id="count">0</span></h3>
+
+<button class="vote" onclick="vote()">投票 +1</button>
+<button class="undo" onclick="undo()">撤回 -1</button>
+
+</div>
+
+<!-- Firebase（穩定版 CDN） -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+
+/* =========================
+   Firebase 設定
+========================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyDfGrNNk4XNhfLotu_1_MeQ-ZFfx1uz5fs",
+  authDomain: "photovote0602.firebaseapp.com",
+  projectId: "photovote0602",
+  storageBucket: "photovote0602.firebasestorage.app",
+  messagingSenderId: "821096183892",
+  appId: "1:821096183892:web:706d8ae27f07ff6145d5c1"
+};
+
+/* 初始化 */
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* =========================
+   Debug 顯示
+========================= */
+function log(msg){
+    document.getElementById("debug").innerHTML += "<br>" + msg;
+}
+
+/* =========================
+   取得 ID
+========================= */
+const id = new URLSearchParams(location.search).get("id");
+
+log("ID = " + id);
+log("URL = " + location.href);
+
+if(!id){
+    log("❌ 沒有 ID（請用 vote.html?id=001）");
+}
+
+/* =========================
+   圖片
+========================= */
+const img = document.getElementById("photo");
+
+img.src = id
+? `PHOTO/${id}.jpg`
+: "https://placehold.co/800x600?text=NO+ID";
+
+img.onerror = function(){
+    this.src = "https://placehold.co/800x600?text=NOT+FOUND+"+id;
+};
+
+/* =========================
+   作品資訊
+========================= */
+document.getElementById("title").innerText =
+"作品 " + (id || "NULL");
+
+document.getElementById("author").innerText =
+"攝影者 " + (id || "???");
+
+/* =========================
+   Firestore
+========================= */
+let ref = db.collection("votes").doc(id || "null");
+
+/* 即時監聽 */
+ref.onSnapshot(doc=>{
+
+    if(!doc.exists){
+        ref.set({votes:0});
+        document.getElementById("count").innerText = 0;
+        log("建立初始票數");
+        return;
+    }
+
+    document.getElementById("count").innerText =
+    doc.data().votes;
+
+    log("票數更新：" + doc.data().votes);
+});
+
+/* =========================
+   投票
+========================= */
+function vote(){
+
+    ref.update({
+        votes: firebase.firestore.FieldValue.increment(1)
+    }).then(()=>log("✔ 投票成功"))
+      .catch(e=>log("❌ 投票失敗：" + e.message));
+}
+
+/* =========================
+   撤票
+========================= */
+function undo(){
+
+    ref.update({
+        votes: firebase.firestore.FieldValue.increment(-1)
+    }).then(()=>log("✔ 撤票成功"))
+      .catch(e=>log("❌ 撤票失敗：" + e.message));
+}
+
+</script>
+
+</body>
+</html>
