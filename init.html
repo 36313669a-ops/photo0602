@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Firebase 65張初始化工具</title>
+</head>
+
+<body style="font-family:Arial;text-align:center;padding:40px;">
+
+<h2>Firebase 65張作品初始化</h2>
+
+<p>點擊按鈕會建立 001 ~ 065 投票資料</p>
+
+<button onclick="init()">開始初始化</button>
+
+<p id="status"></p>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+getFirestore,
+doc,
+setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* 🔥 請貼你的 Firebase 設定 */
+const firebaseConfig = {
+  apiKey: "AIzaSyDfGrNNk4XNhfLotu_1_MeQ-ZFfx1uz5fs",
+  authDomain: "photovote0602.firebaseapp.com",
+  projectId: "photovote0602",
+  storageBucket: "photovote0602.firebasestorage.app",
+  messagingSenderId: "821096183892",
+  appId: "1:821096183892:web:706d8ae27f07ff6145d5c1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.init = async function(){
+
+    const status = document.getElementById("status");
+
+    status.innerText = "初始化中...請稍候";
+
+    for(let i=1;i<=65;i++){
+
+        const id = String(i).padStart(3,"0");
+
+        await setDoc(doc(db,"votes",id),{
+            votes:0
+        });
+
+        status.innerText = `已建立 ${id}/065`;
+    }
+
+    status.innerText = "完成！65張作品已建立 🎉";
+};
+
+</script>
+
+</body>
+</html>
